@@ -1,5 +1,4 @@
 using Microsoft.Win32;
-using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -146,7 +145,7 @@ public partial class MainWindow : Window
             if (File.Exists(libraryVdf))
             {
                 string text = File.ReadAllText(libraryVdf);
-                foreach (Match match in Regex.Matches(text, "\\\"path\\\"\\s*\\\"([^\\\"]+)\\\"", RegexOptions.IgnoreCase))
+                foreach (Match match in Regex.Matches(text, @"""path""\s*""([^""]+)""", RegexOptions.IgnoreCase))
                     AddLibrary(match.Groups[1].Value.Replace("\\\\", "\\"));
             }
         }
@@ -159,7 +158,6 @@ public partial class MainWindow : Window
                 return cfg;
         }
 
-        // Small, predictable fallback scan: only the conventional Steam/SteamLibrary roots.
         foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Fixed))
         {
             foreach (string rootName in new[] { "SteamLibrary", "Steam" })

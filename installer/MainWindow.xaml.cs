@@ -22,6 +22,13 @@ public partial class MainWindow : Window
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         });
+
+        WelcomeArtwork.BeginAnimation(OpacityProperty, new DoubleAnimation(0.70, 0.82, TimeSpan.FromSeconds(4.5))
+        {
+            AutoReverse = true,
+            RepeatBehavior = RepeatBehavior.Forever,
+            EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+        });
     }
 
     private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -43,6 +50,7 @@ public partial class MainWindow : Window
     {
         InstallButton.IsEnabled = false;
         SwapPanels(IntroPanel, InstallPanel);
+        StartInstallArtworkAnimation();
 
         try
         {
@@ -52,6 +60,7 @@ public partial class MainWindow : Window
             string? cfgDirectory = await Task.Run(FindCs2CfgDirectory);
             if (cfgDirectory is null)
             {
+                StopInstallArtworkAnimation();
                 ShowError("Не удалось автоматически найти Counter-Strike 2. Проверь, что Steam и CS2 установлены, затем запусти установщик снова.");
                 return;
             }
@@ -89,16 +98,52 @@ public partial class MainWindow : Window
                 throw new IOException("Phantom.cfg не удалось записать корректно.");
 
             InstalledPath.Text = destination;
+            StopInstallArtworkAnimation();
             SwapPanels(InstallPanel, DonePanel);
         }
         catch (UnauthorizedAccessException)
         {
+            StopInstallArtworkAnimation();
             ShowError("Windows запретил запись в папку CS2. Перезапусти установщик и подтверди запрос администратора.");
         }
         catch (Exception ex)
         {
+            StopInstallArtworkAnimation();
             ShowError("Установка не завершена: " + ex.Message);
         }
+    }
+
+    private void StartInstallArtworkAnimation()
+    {
+        InstallArtwork.BeginAnimation(OpacityProperty, new DoubleAnimation(0.48, 0.68, TimeSpan.FromSeconds(1.8))
+        {
+            AutoReverse = true,
+            RepeatBehavior = RepeatBehavior.Forever,
+            EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+        });
+
+        InstallArtworkScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty,
+            new DoubleAnimation(1.035, 1.065, TimeSpan.FromSeconds(3.2))
+            {
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever,
+                EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+            });
+
+        InstallArtworkScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty,
+            new DoubleAnimation(1.035, 1.065, TimeSpan.FromSeconds(3.2))
+            {
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever,
+                EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+            });
+    }
+
+    private void StopInstallArtworkAnimation()
+    {
+        InstallArtwork.BeginAnimation(OpacityProperty, null);
+        InstallArtworkScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, null);
+        InstallArtworkScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, null);
     }
 
     private void ShowError(string message)

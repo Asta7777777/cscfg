@@ -18,7 +18,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="..\IMG_0240.jpeg" Link="IMG_0240.jpeg" />
+    <Resource Include="..\assets\welcome.jpeg" Link="assets\welcome.jpeg" />
+    <Resource Include="..\assets\installing.png" Link="assets\installing.png" />
+    <Resource Include="..\assets\installed.png" Link="assets\installed.png" />
     <Resource Include="..\Phantom.cfg" Link="Phantom.cfg" />
   </ItemGroup>
 </Project>

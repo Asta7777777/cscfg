@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "Phantom.cfg"
-      - "IMG_0240.jpeg"
+      - "assets/**"
       - "installer/**"
       - ".github/workflows/build-installer.yml"
   workflow_dispatch:
@@ -31,11 +31,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Create EXE icon from IMG_0240.jpeg
+      - name: Create EXE icon from welcome artwork
         shell: pwsh
         run: |
           python -m pip install --disable-pip-version-check pillow
-          python -c "from PIL import Image; im=Image.open('IMG_0240.jpeg').convert('RGBA'); im.thumbnail((512,512)); im.save('installer/Phantom.ico', format='ICO', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])"
+          python -c "from PIL import Image; im=Image.open('assets/welcome.jpeg').convert('RGBA'); im.thumbnail((512,512)); im.save('installer/Phantom.ico', format='ICO', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])"
 
       - name: Build single-file installer
         shell: pwsh

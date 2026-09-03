@@ -5,10 +5,17 @@ on:
     branches: [main]
     paths:
       - "Phantom.cfg"
+      - "IMG_0240.jpeg"
+      - "F1F5C1E3-7717-4AEB-87E9-7561B91FF732.png"
+      - "27DE3101-4CE1-4B63-BFF7-7A4171AA93D5.png"
       - "assets/**"
       - "installer/**"
       - ".github/workflows/build-installer.yml"
   workflow_dispatch:
+
+concurrency:
+  group: phantom-installer-main
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -20,6 +27,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Organize installer artwork
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force assets | Out-Null
+
+          if (Test-Path "IMG_0240.jpeg") {
+            Move-Item "IMG_0240.jpeg" "assets/welcome.jpeg" -Force
+          }
+          if (Test-Path "F1F5C1E3-7717-4AEB-87E9-7561B91FF732.png") {
+            Move-Item "F1F5C1E3-7717-4AEB-87E9-7561B91FF732.png" "assets/installing.png" -Force
+          }
+          if (Test-Path "27DE3101-4CE1-4B63-BFF7-7A4171AA93D5.png") {
+            Move-Item "27DE3101-4CE1-4B63-BFF7-7A4171AA93D5.png" "assets/installed.png" -Force
+          }
+
+          if (-not (Test-Path "assets/welcome.jpeg")) { throw "Missing assets/welcome.jpeg" }
+          if (-not (Test-Path "assets/installing.png")) { throw "Missing assets/installing.png" }
+          if (-not (Test-Path "assets/installed.png")) { throw "Missing assets/installed.png" }
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
@@ -44,6 +70,15 @@ jobs:
           New-Item -ItemType Directory -Force release | Out-Null
           Copy-Item publish/PhantomInstaller.exe release/PhantomInstaller.exe -Force
 
+      - name: Verify standalone EXE
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "release/PhantomInstaller.exe")) { throw "PhantomInstaller.exe was not produced" }
+          $size = (Get-Item "release/PhantomInstaller.exe").Length
+          if ($size -lt 1000000) { throw "Installer EXE is unexpectedly small; embedded runtime/resources may be missing" }
+          Write-Host "Standalone installer size: $size bytes"
+          Write-Host "User only needs release/PhantomInstaller.exe. No assets folder or cfg beside it is required."
+
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
@@ -51,15 +86,16 @@ jobs:
           path: release/PhantomInstaller.exe
           if-no-files-found: error
 
-      - name: Commit latest EXE to repository
+      - name: Commit organized assets and latest EXE
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- assets IMG_0240.jpeg F1F5C1E3-7717-4AEB-87E9-7561B91FF732.png 27DE3101-4CE1-4B63-BFF7-7A4171AA93D5.png
           git add -f release/PhantomInstaller.exe
           if (-not (git diff --cached --quiet)) {
-            git commit -m "build: update PhantomInstaller.exe [skip ci]"
+            git commit -m "build: organize artwork and update standalone installer [skip ci]"
             git push
           } else {
-            Write-Host "Installer binary is already current."
+            Write-Host "Installer binary and assets are already current."
           }

@@ -62,8 +62,8 @@
                     <Image Source="/IMG_0240.jpeg" Stretch="UniformToFill"/>
                 </Border>
                 <StackPanel Grid.Column="1" Margin="13,1,0,0">
-                    <TextBlock Text="PHANTOM" Foreground="White" FontWeight="Bold" FontSize="18" CharacterSpacing="180"/>
-                    <TextBlock Text="CS2 CONFIG INSTALLER" Foreground="#777777" FontSize="10" Margin="1,4,0,0" CharacterSpacing="120"/>
+                    <TextBlock Text="P H A N T O M" Foreground="White" FontWeight="Bold" FontSize="18"/>
+                    <TextBlock Text="CS2 CONFIG INSTALLER" Foreground="#777777" FontSize="10" Margin="1,4,0,0"/>
                 </StackPanel>
                 <Button Grid.Column="2" Width="38" Height="38" Content="×" FontSize="23" Foreground="#A0A0A0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="Close_Click"/>
             </Grid>
@@ -139,7 +139,7 @@
                 </Grid>
             </Grid>
 
-            <TextBlock Grid.Row="2" Text="PHANTOM • LOCAL INSTALL • NO GAME MODIFICATION" Foreground="#3F3F3F" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Top" CharacterSpacing="80"/>
+            <TextBlock Grid.Row="2" Text="PHANTOM • LOCAL INSTALL • NO GAME MODIFICATION" Foreground="#3F3F3F" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Top"/>
         </Grid>
     </Border>
 </Window>

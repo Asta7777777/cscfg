@@ -7,6 +7,9 @@ on:
       - "Phantom.cfg"
       - "assets/**"
       - "installer/**"
+      - "README.md"
+      - "LICENSE"
+      - "SECURITY.md"
       - ".github/workflows/build-installer.yml"
   workflow_dispatch:
 
@@ -25,7 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify embedded artwork
+      - name: Verify embedded resources
         shell: pwsh
         run: |
           if (-not (Test-Path "assets/welcome.jpeg")) { throw "Missing assets/welcome.jpeg" }
@@ -52,6 +55,8 @@ jobs:
       - name: Build standalone EXE
         shell: pwsh
         run: |
+          dotnet restore installer/PhantomInstaller.csproj
+          dotnet build installer/PhantomInstaller.csproj -c Release --no-restore
           dotnet publish installer/PhantomInstaller.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o publish
           New-Item -ItemType Directory -Force release | Out-Null
           Copy-Item publish/PhantomInstaller.exe release/PhantomInstaller.exe -Force
@@ -62,12 +67,14 @@ jobs:
           if (-not (Test-Path "release/PhantomInstaller.exe")) { throw "PhantomInstaller.exe was not produced" }
           $size = (Get-Item "release/PhantomInstaller.exe").Length
           if ($size -lt 1000000) { throw "Installer is unexpectedly small" }
+          $hash = (Get-FileHash "release/PhantomInstaller.exe" -Algorithm SHA256).Hash.ToLowerInvariant()
           Write-Host "Standalone installer size: $size bytes"
+          Write-Host "SHA256: $hash"
 
       - name: Upload Actions artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PhantomInstaller
+          name: PhantomInstaller-v1.1.0
           path: release/PhantomInstaller.exe
           if-no-files-found: error
 
@@ -76,9 +83,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "v1.0.0"
+          $tag = "v1.1.0"
+          $notes = @"
+          Phantom Installer v1.1.0
+
+          - Finds Steam and CS2 across system and non-system drives and custom Steam libraries.
+          - Built-in Phantom.cfg installer.
+          - Install any custom .cfg and automatically generate the matching +exec command.
+          - CFG Builder reads local CS2 convars, binds, machine/video values and exposes them in the editor.
+          - Hardware optimizer analyzes CPU, GPU, RAM and display refresh rate locally and applies a safe performance profile.
+          - Generated CFG can be saved directly to Downloads and installed into CS2 in one action.
+          - Generated files are personalized, watermarked with comment-only markers, and contain a SHA-256 Phantom signature.
+          - Everything stays local; no CS2 settings or hardware data are uploaded.
+          - One standalone PhantomInstaller.exe; no extra folder is required.
+          "@
           gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.0.0" --notes "Standalone Phantom Installer for CS2. Includes the built-in Phantom.cfg, custom CFG installation, and a CFG Builder that exports current CS2 settings. Download PhantomInstaller.exe and run it — no extra folder is required."
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.1.0" --notes $notes
+          } else {
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "Phantom Installer v1.1.0" --notes $notes
           }
           gh release upload $tag "release/PhantomInstaller.exe" --repo $env:GITHUB_REPOSITORY --clobber

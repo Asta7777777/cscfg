@@ -57,30 +57,48 @@ jobs:
         run: |
           dotnet restore installer/PhantomInstaller.csproj
           dotnet build installer/PhantomInstaller.csproj -c Release --no-restore
-          dotnet publish installer/PhantomInstaller.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o publish
+          dotnet publish installer/PhantomInstaller.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o publish
           New-Item -ItemType Directory -Force release | Out-Null
           Copy-Item publish/PhantomInstaller.exe release/PhantomInstaller.exe -Force
 
-      - name: Startup smoke test
+      - name: Verify truly standalone output
         shell: pwsh
         run: |
-          $dll = Get-ChildItem "installer/bin/Release" -Recurse -Filter "PhantomInstaller.dll" | Select-Object -First 1
-          if ($null -eq $dll) { throw "Framework build DLL not found for startup smoke test" }
-          $env:PHANTOM_STARTUP_SMOKE = "1"
-          & dotnet $dll.FullName
-          $exit = $LASTEXITCODE
-          Remove-Item Env:PHANTOM_STARTUP_SMOKE -ErrorAction SilentlyContinue
-          if ($exit -ne 0) {
-            $log = Join-Path $env:LOCALAPPDATA "PhantomInstaller/startup.log"
-            if (Test-Path $log) { Get-Content $log }
-            throw "Phantom Installer startup smoke test failed with exit code $exit"
+          if (-not (Test-Path "publish/PhantomInstaller.exe")) { throw "PhantomInstaller.exe was not produced" }
+          $companions = @(Get-ChildItem "publish" -File | Where-Object { $_.Name -ne "PhantomInstaller.exe" })
+          if ($companions.Count -ne 0) {
+            $names = ($companions | ForEach-Object Name) -join ", "
+            throw "Publish is not standalone; companion files remain: $names"
           }
-          Write-Host "Startup smoke test passed"
+
+      - name: Test the exact release EXE in isolation
+        shell: pwsh
+        run: |
+          $probeDir = Join-Path $env:RUNNER_TEMP "phantom-release-probe"
+          New-Item -ItemType Directory -Force $probeDir | Out-Null
+          $probeExe = Join-Path $probeDir "PhantomInstaller.exe"
+          Copy-Item "release/PhantomInstaller.exe" $probeExe -Force
+          $env:PHANTOM_STARTUP_SMOKE = "1"
+          try {
+            $process = Start-Process -FilePath $probeExe -PassThru
+            if (-not $process.WaitForExit(30000)) {
+              Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+              throw "Release EXE startup test timed out"
+            }
+            if ($process.ExitCode -ne 0) {
+              $log = Join-Path $env:LOCALAPPDATA "PhantomInstaller/startup.log"
+              if (Test-Path $log) { Get-Content $log }
+              throw "Release EXE startup test failed with exit code $($process.ExitCode)"
+            }
+          }
+          finally {
+            Remove-Item Env:PHANTOM_STARTUP_SMOKE -ErrorAction SilentlyContinue
+          }
+          Write-Host "Exact release EXE startup test passed"
 
       - name: Verify standalone EXE
         shell: pwsh
         run: |
-          if (-not (Test-Path "release/PhantomInstaller.exe")) { throw "PhantomInstaller.exe was not produced" }
           $size = (Get-Item "release/PhantomInstaller.exe").Length
           if ($size -lt 1000000) { throw "Installer is unexpectedly small" }
           $hash = (Get-FileHash "release/PhantomInstaller.exe" -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -90,7 +108,7 @@ jobs:
       - name: Upload Actions artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PhantomInstaller-v1.2.1
+          name: PhantomInstaller-v1.2.2
           path: release/PhantomInstaller.exe
           if-no-files-found: error
 
@@ -99,23 +117,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "v1.2.1"
+          $tag = "v1.2.2"
           $notes = @"
-          Phantom Installer v1.2.1
+          Phantom Installer v1.2.2
 
-          - Fixes the silent-startup failure path reported after v1.2.0.
-          - Startup is now explicit and protected by global WPF exception handling.
-          - Fatal startup errors are shown to the user instead of disappearing silently.
-          - A diagnostic log is written to %LOCALAPPDATA%\PhantomInstaller\startup.log if startup fails.
-          - CI now runs a real WPF startup smoke test before a release is published.
-          - Keeps the Pro Presets library for donk, m0NESY, ZywOo, s1mple, NiKo, ropz, XANTARES, device, sh1ro and b1t.
-          - Existing CFG Builder, hardware optimization, multi-drive CS2 discovery, signatures and custom CFG installation remain included.
-          - One standalone PhantomInstaller.exe; no extra folder is required.
+          - Fixes the downloaded EXE closing immediately after launch.
+          - Bundles the native WPF runtime libraries into the single downloadable EXE.
+          - No longer requests administrator rights just to open the application.
+          - CI now launches the exact isolated release EXE, not a DLL with build-folder dependencies.
+          - Keeps startup crash reporting in %LOCALAPPDATA%\PhantomInstaller\startup.log.
+          - Keeps Pro Presets, CFG Builder, hardware optimization, multi-drive CS2 discovery, signatures and custom CFG installation.
+          - One standalone PhantomInstaller.exe; no extra folder or .NET installation is required.
           "@
           gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.2.1" --notes $notes
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.2.2" --notes $notes
           } else {
-            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "Phantom Installer v1.2.1" --notes $notes
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "Phantom Installer v1.2.2" --notes $notes
           }
           gh release upload $tag "release/PhantomInstaller.exe" --repo $env:GITHUB_REPOSITORY --clobber

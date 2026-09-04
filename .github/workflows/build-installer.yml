@@ -61,6 +61,22 @@ jobs:
           New-Item -ItemType Directory -Force release | Out-Null
           Copy-Item publish/PhantomInstaller.exe release/PhantomInstaller.exe -Force
 
+      - name: Startup smoke test
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem "installer/bin/Release" -Recurse -Filter "PhantomInstaller.dll" | Select-Object -First 1
+          if ($null -eq $dll) { throw "Framework build DLL not found for startup smoke test" }
+          $env:PHANTOM_STARTUP_SMOKE = "1"
+          & dotnet $dll.FullName
+          $exit = $LASTEXITCODE
+          Remove-Item Env:PHANTOM_STARTUP_SMOKE -ErrorAction SilentlyContinue
+          if ($exit -ne 0) {
+            $log = Join-Path $env:LOCALAPPDATA "PhantomInstaller/startup.log"
+            if (Test-Path $log) { Get-Content $log }
+            throw "Phantom Installer startup smoke test failed with exit code $exit"
+          }
+          Write-Host "Startup smoke test passed"
+
       - name: Verify standalone EXE
         shell: pwsh
         run: |
@@ -74,7 +90,7 @@ jobs:
       - name: Upload Actions artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PhantomInstaller-v1.2.0
+          name: PhantomInstaller-v1.2.1
           path: release/PhantomInstaller.exe
           if-no-files-found: error
 
@@ -83,23 +99,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "v1.2.0"
+          $tag = "v1.2.1"
           $notes = @"
-          Phantom Installer v1.2.0
+          Phantom Installer v1.2.1
 
-          - Adds an offline Pro Presets library for donk, m0NESY, ZywOo, s1mple, NiKo, ropz, XANTARES, device, sh1ro and b1t.
-          - Presets include public snapshot values for sensitivity, zoom sensitivity, crosshair and viewmodel.
-          - DPI, eDPI, resolution, aspect ratio, scaling and published FPS caps are shown as reference instead of being forced onto different hardware.
-          - A pro preset can be overlaid onto the CFG Builder while preserving the user's other local settings and binds.
-          - A pro preset can also be signed, saved to Downloads and installed into CS2 in one click.
-          - The finished screen automatically generates the matching +exec Phantom-<player>.cfg command.
-          - Existing multi-drive Steam/CS2 discovery, hardware optimization, CFG signatures and custom CFG installation remain included.
+          - Fixes the silent-startup failure path reported after v1.2.0.
+          - Startup is now explicit and protected by global WPF exception handling.
+          - Fatal startup errors are shown to the user instead of disappearing silently.
+          - A diagnostic log is written to %LOCALAPPDATA%\PhantomInstaller\startup.log if startup fails.
+          - CI now runs a real WPF startup smoke test before a release is published.
+          - Keeps the Pro Presets library for donk, m0NESY, ZywOo, s1mple, NiKo, ropz, XANTARES, device, sh1ro and b1t.
+          - Existing CFG Builder, hardware optimization, multi-drive CS2 discovery, signatures and custom CFG installation remain included.
           - One standalone PhantomInstaller.exe; no extra folder is required.
           "@
           gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.2.0" --notes $notes
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.2.1" --notes $notes
           } else {
-            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "Phantom Installer v1.2.0" --notes $notes
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "Phantom Installer v1.2.1" --notes $notes
           }
           gh release upload $tag "release/PhantomInstaller.exe" --repo $env:GITHUB_REPOSITORY --clobber

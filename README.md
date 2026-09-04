@@ -1,6 +1,6 @@
 # Phantom Installer
 
-**CS2 CFG installer, builder and local hardware optimizer for Windows.**
+**CS2 CFG installer, builder, pro preset library and local hardware optimizer for Windows.**
 
 [Download the latest PhantomInstaller.exe](https://github.com/Alexg7372/cscfg/releases/latest/download/PhantomInstaller.exe)
 
@@ -20,6 +20,34 @@ Examples:
 
 - `MyConfig.cfg` → `+exec MyConfig.cfg`
 - `My Cool Config.cfg` → `+exec "My Cool Config.cfg"`
+
+### Pro Presets
+
+Phantom Installer v1.2.0 includes offline preset snapshots for:
+
+- donk
+- m0NESY
+- ZywOo
+- s1mple
+- NiKo
+- ropz
+- XANTARES
+- device
+- sh1ro
+- b1t
+
+Each preset contains publicly listed CFG-compatible values for mouse sensitivity, zoom sensitivity, crosshair and viewmodel. The app also displays reference values such as DPI/eDPI, resolution, aspect ratio, scaling mode and the published FPS cap.
+
+Reference-only hardware/display values are deliberately not forced onto another PC. This avoids changing a user's Windows mouse setup or applying a pro player's resolution blindly.
+
+A preset can be:
+
+1. applied on top of the CFG Builder while keeping the user's other local settings and binds;
+2. signed and saved as `Phantom-<player>.cfg` to Downloads;
+3. installed into CS2 immediately;
+4. launched with the exact generated `+exec Phantom-<player>.cfg` command.
+
+Preset source snapshots and update dates are documented in [`docs/PRO_PRESETS.md`](docs/PRO_PRESETS.md). Pro settings can change, so the application presents them as dated snapshots rather than permanent or officially endorsed configurations.
 
 ### CFG Builder / Settings editor
 
@@ -77,7 +105,7 @@ This means CS2 can be on `C:`, `D:`, another fixed drive, or a custom Steam libr
 
 ## Privacy
 
-Phantom Installer is local-only. It does not send CS2 settings, CFG contents or detected hardware information to a server or cloud API.
+Phantom Installer is local-only. It does not send CS2 settings, CFG contents or detected hardware information to a server or cloud API. Pro preset snapshots are built into the executable, so selecting them does not require an internet connection.
 
 ## Requirements
 
@@ -93,7 +121,7 @@ dotnet restore installer/PhantomInstaller.csproj
 dotnet publish installer/PhantomInstaller.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
 ```
 
-GitHub Actions builds the standalone EXE and publishes `PhantomInstaller.exe` as the asset of release `v1.1.0`.
+GitHub Actions builds the standalone EXE and publishes `PhantomInstaller.exe` as the asset of release `v1.2.0`.
 
 ## Security note
 

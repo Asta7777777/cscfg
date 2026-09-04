@@ -1,55 +1,104 @@
 # Phantom Installer
 
-## Скачать
+**CS2 CFG installer, builder and local hardware optimizer for Windows.**
 
-**[Скачать PhantomInstaller.exe](https://github.com/Alexg7372/cscfg/releases/latest/download/PhantomInstaller.exe)**
+[Download the latest PhantomInstaller.exe](https://github.com/Alexg7372/cscfg/releases/latest/download/PhantomInstaller.exe)
 
-Один автономный EXE для Counter-Strike 2. Никакие дополнительные папки, assets, DLL или отдельный `Phantom.cfg` рядом с установщиком не нужны.
+One standalone EXE. No `assets` folder, DLLs or separate runtime are required next to it.
 
-## Что умеет
+## Features
 
-### 1. Phantom CFG
+### Built-in Phantom.cfg
 
-Внутри установщика уже находится мой готовый `Phantom.cfg`:
+Installs the bundled `Phantom.cfg` directly into the detected Counter-Strike 2 `game\csgo\cfg` directory. If a file with the same name already exists, Phantom Installer creates a timestamped backup first.
 
-- `fps_max 120`
-- `fps_max_ui 120`
-- `cl_crosshair_recoil 0`
-- `r_drawtracers_firstperson 1`
-- `r_fullscreen_gamma 2.4`
-- `viewmodel_fov 68`
-- `viewmodel_offset_x 2.5`
-- `viewmodel_offset_y 2`
-- `viewmodel_offset_z -2`
-- сохранены мой прицел, sensitivity и бинды
+### Install any custom CFG
 
-Кнопка **УСТАНОВИТЬ PHANTOM CFG** сама находит CS2, делает backup старого файла и ставит конфиг в `game\csgo\cfg`.
+Choose any `.cfg` file. The installer finds CS2, copies the file into the correct CFG directory and generates the exact Steam launch option from the real filename.
 
-### 2. Свой CFG
+Examples:
 
-Кнопка **УСТАНОВИТЬ СВОЙ CFG** открывает выбор файла. Можно выбрать любой `.cfg`; Phantom Installer скопирует его в правильную папку CS2, сохранив предыдущий файл с таким именем в backup.
+- `MyConfig.cfg` → `+exec MyConfig.cfg`
+- `My Cool Config.cfg` → `+exec "My Cool Config.cfg"`
 
-После установки показывается готовая Steam-команда вида:
+### CFG Builder / Settings editor
 
-`+exec MyConfig.cfg`
+Phantom Installer reads local CS2 files from Steam `userdata/<account>/730/local/cfg` and displays discovered settings inside the app:
 
-Её можно скопировать одной кнопкой.
+- user convars;
+- binds;
+- machine values;
+- video values;
+- other discovered CS2 VCFG/TXT key-value settings.
 
-### 3. CFG Builder
+Executable convars and binds can be edited and included in the generated CFG. Machine/video values that are not safe console commands are preserved as comments so the generated file can still contain a local snapshot without sending invalid commands to CS2.
 
-Кнопка **СОЗДАТЬ CFG** читает актуальные настройки CS2 из Steam `userdata/<AccountID>/730/local/cfg`, собирает пользовательские convar-настройки и бинды в обычный `.cfg`, после чего открывает сохранение файла.
+### Hardware optimization
 
-Имя и папку выбирает пользователь сам. Исходные настройки CS2 при этом не изменяются.
+The optimizer runs locally and inspects available Windows hardware information:
 
-## Установка
+- CPU;
+- logical processor count;
+- physical RAM;
+- GPU adapters;
+- active display resolution / refresh-rate information when Windows exposes it.
 
-1. Скачать `PhantomInstaller.exe` из Releases.
-2. Запустить и подтвердить UAC.
-3. Выбрать один из трёх режимов.
-4. Для установленного CFG скопировать показанную команду в Steam → Counter-Strike 2 → Свойства → Основные → Параметры запуска.
+It then applies a conservative CS2 profile to the builder, including an FPS target matched to the detected hardware/display tier plus safe performance/network/audio values. It does not upload hardware data anywhere.
 
-## Сборка
+### Build + install in one click
 
-Установщик — кастомное WPF-приложение в чёрно-белом стиле. `welcome.jpeg`, `installing.png`, `installed.png`, встроенный `Phantom.cfg` и self-contained .NET runtime упаковываются в один `PhantomInstaller.exe`.
+Enter a CFG name and a user/signature name, then choose **Downloads + Install**. Phantom Installer:
 
-GitHub Actions автоматически пересобирает EXE и обновляет asset в GitHub Release `v1.0.0`.
+1. builds the CFG from the current editor values;
+2. saves a copy to the user's `Downloads` folder;
+3. finds CS2 even when Steam or the game is on another drive or custom Steam library;
+4. installs the same CFG into CS2;
+5. creates a backup before replacing an existing file;
+6. shows the exact `+exec` command with a one-click copy button.
+
+### Phantom signature / watermark
+
+Generated CFG files contain comment-only Phantom metadata:
+
+- owner/user name;
+- unique CFG ID;
+- generated timestamp;
+- SHA-256 payload signature;
+- repeated Phantom watermark comments;
+- final `by Phantom • <user>` marker.
+
+These lines are comments and do not change CS2 behavior. A Phantom-signed CFG that is later modified can be detected when it is loaded again through the custom CFG installer.
+
+## Steam / CS2 discovery
+
+The installer checks the Steam registry path, standard Steam locations on available fixed drives, common `SteamLibrary` locations, and `libraryfolders.vdf`. If `appmanifest_730.acf` is present, its actual CS2 `installdir` value is used instead of assuming a fixed game path.
+
+This means CS2 can be on `C:`, `D:`, another fixed drive, or a custom Steam library.
+
+## Privacy
+
+Phantom Installer is local-only. It does not send CS2 settings, CFG contents or detected hardware information to a server or cloud API.
+
+## Requirements
+
+- Windows 10/11 x64
+- Steam + Counter-Strike 2 for installation/build-from-current-settings features
+
+The release is self-contained with the .NET runtime bundled into the EXE.
+
+## Build from source
+
+```powershell
+dotnet restore installer/PhantomInstaller.csproj
+dotnet publish installer/PhantomInstaller.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+```
+
+GitHub Actions builds the standalone EXE and publishes `PhantomInstaller.exe` as the asset of release `v1.1.0`.
+
+## Security note
+
+The current release requests administrator privileges because CS2/Steam may be installed in protected directories. The EXE is not Authenticode-signed with a commercial Windows code-signing certificate, so SmartScreen may show a warning on some systems.
+
+## License
+
+MIT. See `LICENSE`.

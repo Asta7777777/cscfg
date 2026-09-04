@@ -17,6 +17,17 @@ public partial class App : Application
         {
             var window = new MainWindow();
             MainWindow = window;
+
+            // CI-only startup probe: construct the real WPF window and invoke its Loaded path
+            // without requiring an interactive desktop or UAC prompt.
+            if (string.Equals(Environment.GetEnvironmentVariable("PHANTOM_STARTUP_SMOKE"), "1", StringComparison.Ordinal))
+            {
+                window.RaiseEvent(new RoutedEventArgs(FrameworkElement.LoadedEvent));
+                window.Close();
+                Shutdown(0);
+                return;
+            }
+
             window.Show();
         }
         catch (Exception ex)

@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+publish/
+installer/Phantom.ico
+*.user
+*.suo
+*.tmp
+*.log

@@ -71,19 +71,6 @@ jobs:
           path: release/PhantomInstaller.exe
           if-no-files-found: error
 
-      - name: Commit latest EXE
-        shell: pwsh
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f release/PhantomInstaller.exe
-          if (-not (git diff --cached --quiet)) {
-            git commit -m "build: update PhantomInstaller.exe [skip ci]"
-            git push
-          } else {
-            Write-Host "Installer binary is already current."
-          }
-
       - name: Publish GitHub Release
         shell: pwsh
         env:

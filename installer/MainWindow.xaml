@@ -1,34 +1,84 @@
 <Window x:Class="PhantomInstaller.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Phantom Installer" Width="860" Height="610"
-        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="NoResize"
-        AllowsTransparency="True" Background="Transparent" Opacity="0" Loaded="Window_Loaded">
+        Title="Phantom Installer"
+        Width="980" Height="700"
+        MinWidth="980" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" ResizeMode="NoResize"
+        AllowsTransparency="True" Background="Transparent"
+        Opacity="0" Loaded="Window_Loaded">
     <Window.Resources>
         <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Foreground" Value="#090909"/><Setter Property="Background" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/><Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="18,13"/>
-            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
-                <Border x:Name="B" Background="{TemplateBinding Background}" CornerRadius="12">
-                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-                <ControlTemplate.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="B" Property="Opacity" Value="0.84"/></Trigger>
-                    <Trigger Property="IsPressed" Value="True"><Setter TargetName="B" Property="Opacity" Value="0.66"/></Trigger>
-                </ControlTemplate.Triggers>
-            </ControlTemplate></Setter.Value></Setter>
+            <Setter Property="Foreground" Value="#090909"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonShell" Background="{TemplateBinding Background}" CornerRadius="11">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ButtonShell" Property="Opacity" Value="0.86"/></Trigger>
+                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="ButtonShell" Property="Opacity" Value="0.68"/></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ButtonShell" Property="Opacity" Value="0.38"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style x:Key="GhostButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
-            <Setter Property="Foreground" Value="White"/><Setter Property="Background" Value="#171717"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#181818"/>
+        </Style>
+        <Style x:Key="Input" TargetType="TextBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#101010"/>
+            <Setter Property="BorderBrush" Value="#292929"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="CaretBrush" Value="White"/>
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="#0B0B0B"/>
+            <Setter Property="Foreground" Value="#E8E8E8"/>
+            <Setter Property="BorderBrush" Value="#262626"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#1F1F1F"/>
+            <Setter Property="RowBackground" Value="#0D0D0D"/>
+            <Setter Property="AlternatingRowBackground" Value="#111111"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#151515"/>
+            <Setter Property="Foreground" Value="#AFAFAF"/>
+            <Setter Property="BorderBrush" Value="#262626"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style TargetType="DataGridCell">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Foreground" Value="#E6E6E6"/>
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="30" Background="#090909" BorderBrush="#252525" BorderThickness="1" ClipToBounds="True">
-        <Border.Effect><DropShadowEffect BlurRadius="38" ShadowDepth="0" Opacity="0.60" Color="Black"/></Border.Effect>
+    <Border CornerRadius="30" Background="#090909" BorderBrush="#242424" BorderThickness="1" ClipToBounds="True">
+        <Border.Effect><DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.60" Color="Black"/></Border.Effect>
         <Grid>
-            <Grid.RowDefinitions><RowDefinition Height="76"/><RowDefinition Height="*"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="76"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="26,17,18,0" MouseLeftButtonDown="Header_MouseLeftButtonDown">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -36,118 +86,148 @@
                     <Image Source="/assets/welcome.jpeg" Stretch="UniformToFill"/>
                 </Border>
                 <StackPanel Grid.Column="1" Margin="13,2,0,0">
-                    <TextBlock Text="PHANTOM INSTALLER" Foreground="White" FontWeight="Bold" FontSize="18"/>
-                    <TextBlock Text="CS2 CONFIG MANAGER" Foreground="#707070" FontSize="10" Margin="0,4,0,0"/>
+                    <TextBlock Text="PHANTOM" Foreground="White" FontWeight="Bold" FontSize="18"/>
+                    <TextBlock Text="CS2 CONFIG TOOLKIT" Foreground="#707070" FontSize="10" Margin="0,4,0,0"/>
                 </StackPanel>
-                <Button Grid.Column="2" Width="38" Height="38" Content="×" FontSize="23" Foreground="#A0A0A0"
-                        Background="Transparent" BorderThickness="0" Cursor="Hand" Click="Close_Click"/>
+                <Button Grid.Column="2" Width="38" Height="38" Content="×" FontSize="23" Foreground="#A0A0A0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="Close_Click"/>
             </Grid>
 
-            <Grid Grid.Row="1" Margin="34,4,34,14" ClipToBounds="True">
+            <Grid Grid.Row="1" Margin="28,4,28,16" ClipToBounds="True">
+                <!-- HOME -->
                 <Grid x:Name="IntroPanel" ClipToBounds="True">
-                    <Image x:Name="WelcomeArtwork" Source="/assets/welcome.jpeg" Width="510" Height="470"
-                           HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.76">
-                        <Image.OpacityMask><RadialGradientBrush Center="0.68,0.50" GradientOrigin="0.68,0.50" RadiusX="0.70" RadiusY="0.82">
-                            <GradientStop Color="#FFFFFFFF" Offset="0.32"/><GradientStop Color="#DBFFFFFF" Offset="0.58"/>
-                            <GradientStop Color="#58FFFFFF" Offset="0.80"/><GradientStop Color="#00FFFFFF" Offset="1"/>
-                        </RadialGradientBrush></Image.OpacityMask>
+                    <Image x:Name="WelcomeArtwork" Source="/assets/welcome.jpeg" Width="590" Height="545" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.78">
+                        <Image.OpacityMask>
+                            <RadialGradientBrush Center="0.67,0.50" GradientOrigin="0.67,0.50" RadiusX="0.70" RadiusY="0.80">
+                                <GradientStop Color="#FFFFFFFF" Offset="0.32"/><GradientStop Color="#DCFFFFFF" Offset="0.58"/><GradientStop Color="#58FFFFFF" Offset="0.80"/><GradientStop Color="#00FFFFFF" Offset="1"/>
+                            </RadialGradientBrush>
+                        </Image.OpacityMask>
                     </Image>
-                    <Rectangle HorizontalAlignment="Right" Width="570"><Rectangle.Fill>
-                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                            <GradientStop Color="#FF090909" Offset="0"/><GradientStop Color="#E5090909" Offset="0.34"/>
-                            <GradientStop Color="#65090909" Offset="0.70"/><GradientStop Color="#08090909" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Rectangle.Fill></Rectangle>
-
-                    <StackPanel Width="440" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0">
-                        <TextBlock Text="ВАС ПРИВЕТСТВУЕТ PHANTOM" Foreground="#777777" FontSize="11" FontWeight="SemiBold"/>
-                        <TextBlock Text="CFG ДЛЯ CS2" Foreground="White" FontSize="40" FontWeight="Bold" Margin="0,7,0,0"/>
-                        <TextBlock Text="Выбери, что сделать" Foreground="#A0A0A0" FontSize="14" Margin="0,5,0,18"/>
-
-                        <Button x:Name="PresetButton" Style="{StaticResource PrimaryButton}" Height="48" HorizontalContentAlignment="Left"
-                                Content="УСТАНОВИТЬ PHANTOM CFG   •   готовый профиль" Click="PresetButton_Click"/>
-                        <Button x:Name="CustomButton" Style="{StaticResource GhostButton}" Height="48" HorizontalContentAlignment="Left"
-                                Margin="0,9,0,0" Content="УСТАНОВИТЬ СВОЙ CFG   •   выбрать файл" Click="CustomButton_Click"/>
-                        <Button x:Name="BuildButton" Style="{StaticResource GhostButton}" Height="48" HorizontalContentAlignment="Left"
-                                Margin="0,9,0,0" Content="СОЗДАТЬ CFG   •   собрать мои настройки CS2" Click="BuildButton_Click"/>
-
-                        <TextBlock Text="Один EXE. Phantom.cfg и изображения уже встроены внутрь."
-                                   Foreground="#555555" FontSize="10" Margin="2,17,0,0"/>
+                    <Rectangle HorizontalAlignment="Right" Width="650">
+                        <Rectangle.Fill><LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FF090909" Offset="0"/><GradientStop Color="#E1090909" Offset="0.35"/><GradientStop Color="#4A090909" Offset="0.72"/><GradientStop Color="#05090909" Offset="1"/></LinearGradientBrush></Rectangle.Fill>
+                    </Rectangle>
+                    <StackPanel Width="470" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="42,0,0,0">
+                        <TextBlock Text="PHANTOM INSTALLER" Foreground="#777777" FontSize="11" FontWeight="SemiBold"/>
+                        <TextBlock Text="ТВОЙ CFG. ТВОИ НАСТРОЙКИ." Foreground="White" FontSize="38" FontWeight="Bold" LineHeight="43" Margin="0,9,0,0" TextWrapping="Wrap"/>
+                        <TextBlock Text="Установи готовый Phantom.cfg, загрузи любой свой CFG или собери новый прямо из текущих настроек Counter-Strike 2." Foreground="#8A8A8A" FontSize="13" LineHeight="20" TextWrapping="Wrap" Margin="0,16,20,0"/>
+                        <Button Style="{StaticResource PrimaryButton}" Content="УСТАНОВИТЬ PHANTOM.CFG" Width="285" HorizontalAlignment="Left" Margin="0,26,0,0" Click="PresetButton_Click"/>
+                        <Button Style="{StaticResource GhostButton}" Content="УСТАНОВИТЬ СВОЙ CFG" Width="285" HorizontalAlignment="Left" Margin="0,10,0,0" Click="CustomButton_Click"/>
+                        <Button Style="{StaticResource GhostButton}" Content="CFG BUILDER • НАСТРОЙКИ • ОПТИМИЗАЦИЯ" Width="350" HorizontalAlignment="Left" Margin="0,10,0,0" Click="OpenSettingsButton_Click"/>
                     </StackPanel>
                 </Grid>
 
+                <!-- SETTINGS / BUILDER -->
+                <Grid x:Name="SettingsPanel" Visibility="Collapsed" Opacity="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="8,0,8,12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Button Style="{StaticResource GhostButton}" Content="← НАЗАД" Width="100" Padding="10,8" Click="BackToHome_Click"/>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                            <TextBlock Text="CFG BUILDER" Foreground="White" FontSize="24" FontWeight="Bold"/>
+                            <TextBlock Text="Редактируй найденные настройки CS2, подпиши CFG и установи его одним кликом." Foreground="#777777" FontSize="11" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <TextBlock x:Name="SettingsCountText" Grid.Column="2" Foreground="#777777" FontSize="11" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="#101010" BorderBrush="#262626" BorderThickness="1" CornerRadius="14" Padding="14" Margin="8,0,8,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="1.3*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/></Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="ЖЕЛЕЗО И МОНИТОРЫ" Foreground="#777777" FontSize="9" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="HardwareSummaryText" Text="Нажми «Оптимизировать», чтобы проанализировать ПК." Foreground="#D5D5D5" FontSize="11" TextWrapping="Wrap" Margin="0,5,18,0"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="10,0,10,0">
+                                <TextBlock Text="ИМЯ CFG" Foreground="#777777" FontSize="9" Margin="0,0,0,5"/>
+                                <TextBox x:Name="ConfigNameBox" Style="{StaticResource Input}" Text="MyConfig"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="10,0,0,0">
+                                <TextBlock Text="ПОДПИСЬ / ИМЯ ПОЛЬЗОВАТЕЛЯ" Foreground="#777777" FontSize="9" Margin="0,0,0,5"/>
+                                <TextBox x:Name="SignatureNameBox" Style="{StaticResource Input}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2" Margin="8,0,8,10">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBox x:Name="SettingsSearchBox" Style="{StaticResource Input}" TextChanged="SettingsSearchBox_TextChanged"/>
+                        <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="ОБНОВИТЬ ИЗ CS2" Margin="10,0,0,0" Padding="14,9" Click="RefreshSettings_Click"/>
+                        <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="⚡ ОПТИМИЗИРОВАТЬ ПО ПК" Margin="10,0,0,0" Padding="14,9" Click="OptimizeButton_Click"/>
+                    </Grid>
+
+                    <DataGrid x:Name="SettingsGrid" Grid.Row="3" Margin="8,0,8,10" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" AlternationCount="2" SelectionUnit="FullRow" SelectionMode="Extended">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="CFG" Binding="{Binding Included, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="48"/>
+                            <DataGridTextColumn Header="Раздел" Binding="{Binding Category}" IsReadOnly="True" Width="110"/>
+                            <DataGridTextColumn Header="Настройка" Binding="{Binding Name}" IsReadOnly="True" Width="240"/>
+                            <DataGridTextColumn Header="Значение" Binding="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                            <DataGridTextColumn Header="Источник" Binding="{Binding Source}" IsReadOnly="True" Width="145"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Grid Grid.Row="4" Margin="8,0,8,0">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="Подпись SHA-256 + безопасные комментарии-watermark не влияют на работу CS2." Foreground="#555555" FontSize="10" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="СОХРАНИТЬ КАК…" Width="150" Margin="10,0,0,0" Click="SaveAsButton_Click"/>
+                        <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="В ЗАГРУЗКИ + УСТАНОВИТЬ" Width="220" Margin="10,0,0,0" Click="BuildInstallButton_Click"/>
+                    </Grid>
+                </Grid>
+
+                <!-- WORKING -->
                 <Grid x:Name="InstallPanel" Visibility="Collapsed" Opacity="0" ClipToBounds="True">
-                    <Image x:Name="InstallArtwork" Source="/assets/installing.png" Width="710" Height="470"
-                           HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.58"
-                           RenderTransformOrigin="0.5,0.5">
+                    <Image x:Name="InstallArtwork" Source="/assets/installing.png" Width="800" Height="555" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.60" RenderTransformOrigin="0.5,0.5">
                         <Image.RenderTransform><ScaleTransform x:Name="InstallArtworkScale" ScaleX="1.04" ScaleY="1.04"/></Image.RenderTransform>
-                        <Image.OpacityMask><RadialGradientBrush Center="0.66,0.50" GradientOrigin="0.66,0.50" RadiusX="0.73" RadiusY="0.84">
-                            <GradientStop Color="#FFFFFFFF" Offset="0.32"/><GradientStop Color="#D0FFFFFF" Offset="0.58"/>
-                            <GradientStop Color="#50FFFFFF" Offset="0.81"/><GradientStop Color="#00FFFFFF" Offset="1"/>
-                        </RadialGradientBrush></Image.OpacityMask>
+                        <Image.OpacityMask><RadialGradientBrush Center="0.64,0.50" GradientOrigin="0.64,0.50" RadiusX="0.74" RadiusY="0.84"><GradientStop Color="#FFFFFFFF" Offset="0.34"/><GradientStop Color="#D6FFFFFF" Offset="0.58"/><GradientStop Color="#5AFFFFFF" Offset="0.80"/><GradientStop Color="#00FFFFFF" Offset="1"/></RadialGradientBrush></Image.OpacityMask>
                     </Image>
-                    <Rectangle><Rectangle.Fill><LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                        <GradientStop Color="#FF090909" Offset="0"/><GradientStop Color="#DE090909" Offset="0.40"/>
-                        <GradientStop Color="#5A090909" Offset="0.74"/><GradientStop Color="#10090909" Offset="1"/>
-                    </LinearGradientBrush></Rectangle.Fill></Rectangle>
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Width="450" Margin="46,0,0,0">
-                        <TextBlock x:Name="InstallTitle" Text="УСТАНАВЛИВАЮ CFG" Foreground="White" FontSize="30" FontWeight="Bold"/>
-                        <TextBlock x:Name="InstallStatus" Text="Подготавливаю…" Foreground="#A0A0A0" FontSize="13" Margin="0,12,0,26"/>
-                        <ProgressBar Height="4" Width="405" HorizontalAlignment="Left" IsIndeterminate="True"
-                                     Background="#202020" Foreground="White" BorderThickness="0"/>
+                    <Rectangle><Rectangle.Fill><LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FC090909" Offset="0"/><GradientStop Color="#DA090909" Offset="0.38"/><GradientStop Color="#5A090909" Offset="0.72"/><GradientStop Color="#12090909" Offset="1"/></LinearGradientBrush></Rectangle.Fill></Rectangle>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Width="500" Margin="60,0,0,0">
+                        <TextBlock x:Name="InstallTitle" Text="РАБОТАЮ" Foreground="White" FontSize="32" FontWeight="Bold"/>
+                        <TextBlock x:Name="InstallStatus" Text="Подготавливаю…" Foreground="#A0A0A0" FontSize="13" Margin="0,12,0,26" TextWrapping="Wrap"/>
+                        <ProgressBar Height="4" Width="430" HorizontalAlignment="Left" IsIndeterminate="True" Background="#202020" Foreground="White" BorderThickness="0"/>
                     </StackPanel>
                 </Grid>
 
+                <!-- DONE -->
                 <Grid x:Name="DonePanel" Visibility="Collapsed" Opacity="0" ClipToBounds="True">
-                    <Image Source="/assets/installed.png" Width="540" Height="470" HorizontalAlignment="Right" VerticalAlignment="Center"
-                           Stretch="UniformToFill" Opacity="0.78">
-                        <Image.OpacityMask><RadialGradientBrush Center="0.67,0.50" GradientOrigin="0.67,0.50" RadiusX="0.70" RadiusY="0.82">
-                            <GradientStop Color="#FFFFFFFF" Offset="0.31"/><GradientStop Color="#DCFFFFFF" Offset="0.58"/>
-                            <GradientStop Color="#55FFFFFF" Offset="0.81"/><GradientStop Color="#00FFFFFF" Offset="1"/>
-                        </RadialGradientBrush></Image.OpacityMask>
+                    <Image Source="/assets/installed.png" Width="620" Height="555" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.78">
+                        <Image.OpacityMask><RadialGradientBrush Center="0.68,0.50" GradientOrigin="0.68,0.50" RadiusX="0.70" RadiusY="0.82"><GradientStop Color="#FFFFFFFF" Offset="0.32"/><GradientStop Color="#E8FFFFFF" Offset="0.58"/><GradientStop Color="#60FFFFFF" Offset="0.81"/><GradientStop Color="#00FFFFFF" Offset="1"/></RadialGradientBrush></Image.OpacityMask>
                     </Image>
-                    <Rectangle HorizontalAlignment="Right" Width="590"><Rectangle.Fill><LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                        <GradientStop Color="#FF090909" Offset="0"/><GradientStop Color="#E0090909" Offset="0.37"/>
-                        <GradientStop Color="#50090909" Offset="0.73"/><GradientStop Color="#08090909" Offset="1"/>
-                    </LinearGradientBrush></Rectangle.Fill></Rectangle>
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Width="505" Margin="36,0,0,0">
-                        <Border Width="60" Height="60" CornerRadius="30" Background="White" HorizontalAlignment="Left">
-                            <TextBlock Text="✓" Foreground="#090909" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <TextBlock x:Name="DoneTitle" Text="ГОТОВО" Foreground="White" FontSize="34" FontWeight="Bold" Margin="0,14,0,0"/>
-                        <TextBlock x:Name="DoneSubtitle" Text="CFG установлен" Foreground="#A0A0A0" FontSize="14" Margin="0,4,0,0"/>
-                        <TextBlock x:Name="InstalledPath" Foreground="#555555" FontSize="10" Margin="0,7,0,0"
-                                   TextTrimming="CharacterEllipsis" MaxWidth="470"/>
-
-                        <Border x:Name="LaunchBox" Background="#111111" BorderBrush="#262626" BorderThickness="1"
-                                CornerRadius="14" Padding="16" Margin="0,18,0,0" Width="490">
+                    <Rectangle HorizontalAlignment="Right" Width="690"><Rectangle.Fill><LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5"><GradientStop Color="#FD090909" Offset="0"/><GradientStop Color="#D4090909" Offset="0.35"/><GradientStop Color="#47090909" Offset="0.72"/><GradientStop Color="#08090909" Offset="1"/></LinearGradientBrush></Rectangle.Fill></Rectangle>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Width="550" Margin="55,0,0,0">
+                        <Border Width="62" Height="62" CornerRadius="31" Background="White" HorizontalAlignment="Left"><TextBlock Text="✓" Foreground="#090909" FontSize="31" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                        <TextBlock x:Name="DoneTitle" Text="ГОТОВО" Foreground="White" FontSize="34" FontWeight="Bold" Margin="0,15,0,0"/>
+                        <TextBlock x:Name="DoneSubtitle" Text="CFG готов" Foreground="#A0A0A0" FontSize="14" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="InstalledPath" Foreground="#5C5C5C" FontSize="10" Margin="0,7,0,0" TextTrimming="CharacterEllipsis" MaxWidth="520"/>
+                        <Border x:Name="LaunchBox" Background="#111111" BorderBrush="#262626" BorderThickness="1" CornerRadius="14" Padding="16" Margin="0,19,0,0" Width="520">
                             <StackPanel>
-                                <TextBlock Text="Steam → CS2 → Свойства → Основные → Параметры запуска" Foreground="#8A8A8A" FontSize="10"/>
-                                <Grid Margin="0,10,0,0">
-                                    <Border Background="#080808" CornerRadius="9" Padding="13,10">
-                                        <TextBlock x:Name="LaunchCommandText" Text="+exec Phantom.cfg" Foreground="#EAEAEA" FontFamily="Consolas" FontSize="13"/>
-                                    </Border>
-                                    <Button x:Name="CopyButton" Content="КОПИРОВАТЬ" HorizontalAlignment="Right" Width="122" Height="34"
-                                            Margin="0,0,5,0" Style="{StaticResource GhostButton}" Padding="8,4" FontSize="10" Click="CopyButton_Click"/>
+                                <TextBlock Text="Параметры запуска Steam" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                                <TextBlock Text="Steam → CS2 → Свойства → Основные → Параметры запуска" Foreground="#858585" FontSize="10" Margin="0,6,0,11"/>
+                                <Grid>
+                                    <Border Background="#080808" CornerRadius="9" Padding="13,10"><TextBlock x:Name="LaunchCommandText" Text="+exec Phantom.cfg" Foreground="#EAEAEA" FontFamily="Consolas" FontSize="13"/></Border>
+                                    <Button x:Name="CopyButton" Content="КОПИРОВАТЬ" HorizontalAlignment="Right" Width="125" Height="34" Margin="0,0,5,0" Style="{StaticResource GhostButton}" Padding="8,4" FontSize="10" Click="CopyButton_Click"/>
                                 </Grid>
                             </StackPanel>
                         </Border>
-                        <Button Content="ГОТОВО" Style="{StaticResource PrimaryButton}" Width="180" HorizontalAlignment="Left"
-                                Margin="0,18,0,0" Click="Finish_Click"/>
+                        <Button Content="ГОТОВО" Style="{StaticResource PrimaryButton}" Width="180" HorizontalAlignment="Left" Margin="0,18,0,0" Click="Finish_Click"/>
                     </StackPanel>
                 </Grid>
 
+                <!-- ERROR -->
                 <Grid x:Name="ErrorPanel" Visibility="Collapsed" Opacity="0">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="560">
-                        <TextBlock Text="ОШИБКА" Foreground="White" FontSize="29" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="620">
+                        <TextBlock Text="ОШИБКА" Foreground="White" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <TextBlock x:Name="ErrorText" Foreground="#999999" FontSize="13" TextWrapping="Wrap" TextAlignment="Center" Margin="0,13,0,22"/>
                         <Button Content="ЗАКРЫТЬ" Style="{StaticResource PrimaryButton}" Width="170" Click="Finish_Click"/>
                     </StackPanel>
                 </Grid>
             </Grid>
 
-            <TextBlock Grid.Row="2" Text="PHANTOM • PRESET • CUSTOM CFG • CFG BUILDER" Foreground="#3F3F3F"
-                       FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <TextBlock Grid.Row="2" Text="PHANTOM • LOCAL ONLY • STANDALONE • NO CLOUD UPLOAD" Foreground="#3F3F3F" FontSize="9" HorizontalAlignment="Center" VerticalAlignment="Top"/>
         </Grid>
     </Border>
 </Window>

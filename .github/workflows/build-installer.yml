@@ -74,7 +74,7 @@ jobs:
       - name: Upload Actions artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PhantomInstaller-v1.1.0
+          name: PhantomInstaller-v1.2.0
           path: release/PhantomInstaller.exe
           if-no-files-found: error
 
@@ -83,24 +83,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "v1.1.0"
+          $tag = "v1.2.0"
           $notes = @"
-          Phantom Installer v1.1.0
+          Phantom Installer v1.2.0
 
-          - Finds Steam and CS2 across system and non-system drives and custom Steam libraries.
-          - Built-in Phantom.cfg installer.
-          - Install any custom .cfg and automatically generate the matching +exec command.
-          - CFG Builder reads local CS2 convars, binds, machine/video values and exposes them in the editor.
-          - Hardware optimizer analyzes CPU, GPU, RAM and display refresh rate locally and applies a safe performance profile.
-          - Generated CFG can be saved directly to Downloads and installed into CS2 in one action.
-          - Generated files are personalized, watermarked with comment-only markers, and contain a SHA-256 Phantom signature.
-          - Everything stays local; no CS2 settings or hardware data are uploaded.
+          - Adds an offline Pro Presets library for donk, m0NESY, ZywOo, s1mple, NiKo, ropz, XANTARES, device, sh1ro and b1t.
+          - Presets include public snapshot values for sensitivity, zoom sensitivity, crosshair and viewmodel.
+          - DPI, eDPI, resolution, aspect ratio, scaling and published FPS caps are shown as reference instead of being forced onto different hardware.
+          - A pro preset can be overlaid onto the CFG Builder while preserving the user's other local settings and binds.
+          - A pro preset can also be signed, saved to Downloads and installed into CS2 in one click.
+          - The finished screen automatically generates the matching +exec Phantom-<player>.cfg command.
+          - Existing multi-drive Steam/CS2 discovery, hardware optimization, CFG signatures and custom CFG installation remain included.
           - One standalone PhantomInstaller.exe; no extra folder is required.
           "@
           gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.1.0" --notes $notes
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --target main --title "Phantom Installer v1.2.0" --notes $notes
           } else {
-            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "Phantom Installer v1.1.0" --notes $notes
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "Phantom Installer v1.2.0" --notes $notes
           }
           gh release upload $tag "release/PhantomInstaller.exe" --repo $env:GITHUB_REPOSITORY --clobber

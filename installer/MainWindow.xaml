@@ -45,6 +45,19 @@
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="CaretBrush" Value="White"/>
         </Style>
+        <Style x:Key="DarkCombo" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#101010"/>
+            <Setter Property="BorderBrush" Value="#292929"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#101010"/>
+            <Setter Property="Padding" Value="10,8"/>
+        </Style>
         <Style TargetType="DataGrid">
             <Setter Property="Background" Value="#0B0B0B"/>
             <Setter Property="Foreground" Value="#E8E8E8"/>
@@ -108,10 +121,11 @@
                     <StackPanel Width="470" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="42,0,0,0">
                         <TextBlock Text="PHANTOM INSTALLER" Foreground="#777777" FontSize="11" FontWeight="SemiBold"/>
                         <TextBlock Text="ТВОЙ CFG. ТВОИ НАСТРОЙКИ." Foreground="White" FontSize="38" FontWeight="Bold" LineHeight="43" Margin="0,9,0,0" TextWrapping="Wrap"/>
-                        <TextBlock Text="Установи готовый Phantom.cfg, загрузи любой свой CFG или собери новый прямо из текущих настроек Counter-Strike 2." Foreground="#8A8A8A" FontSize="13" LineHeight="20" TextWrapping="Wrap" Margin="0,16,20,0"/>
-                        <Button Style="{StaticResource PrimaryButton}" Content="УСТАНОВИТЬ PHANTOM.CFG" Width="285" HorizontalAlignment="Left" Margin="0,26,0,0" Click="PresetButton_Click"/>
-                        <Button Style="{StaticResource GhostButton}" Content="УСТАНОВИТЬ СВОЙ CFG" Width="285" HorizontalAlignment="Left" Margin="0,10,0,0" Click="CustomButton_Click"/>
-                        <Button Style="{StaticResource GhostButton}" Content="CFG BUILDER • НАСТРОЙКИ • ОПТИМИЗАЦИЯ" Width="350" HorizontalAlignment="Left" Margin="0,10,0,0" Click="OpenSettingsButton_Click"/>
+                        <TextBlock Text="Установи готовый Phantom.cfg, загрузи свой CFG, собери новый из CS2 или возьми актуальный preset про-игрока." Foreground="#8A8A8A" FontSize="13" LineHeight="20" TextWrapping="Wrap" Margin="0,16,20,0"/>
+                        <Button Style="{StaticResource PrimaryButton}" Content="УСТАНОВИТЬ PHANTOM.CFG" Width="285" HorizontalAlignment="Left" Margin="0,22,0,0" Click="PresetButton_Click"/>
+                        <Button Style="{StaticResource GhostButton}" Content="УСТАНОВИТЬ СВОЙ CFG" Width="285" HorizontalAlignment="Left" Margin="0,9,0,0" Click="CustomButton_Click"/>
+                        <Button Style="{StaticResource GhostButton}" Content="CFG BUILDER • НАСТРОЙКИ • ОПТИМИЗАЦИЯ" Width="350" HorizontalAlignment="Left" Margin="0,9,0,0" Click="OpenSettingsButton_Click"/>
+                        <Button Style="{StaticResource GhostButton}" Content="PRO PRESETS • DONK • M0NESY • ZYWOO" Width="350" HorizontalAlignment="Left" Margin="0,9,0,0" Click="OpenProPresetsButton_Click"/>
                     </StackPanel>
                 </Grid>
 
@@ -175,6 +189,56 @@
                         <TextBlock Text="Подпись SHA-256 + безопасные комментарии-watermark не влияют на работу CS2." Foreground="#555555" FontSize="10" VerticalAlignment="Center"/>
                         <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="СОХРАНИТЬ КАК…" Width="150" Margin="10,0,0,0" Click="SaveAsButton_Click"/>
                         <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="В ЗАГРУЗКИ + УСТАНОВИТЬ" Width="220" Margin="10,0,0,0" Click="BuildInstallButton_Click"/>
+                    </Grid>
+                </Grid>
+
+                <!-- PRO PRESETS -->
+                <Grid x:Name="ProPresetsPanel" Visibility="Collapsed" Opacity="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="8,0,8,14">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Button Style="{StaticResource GhostButton}" Content="← НАЗАД" Width="100" Padding="10,8" Click="BackFromProPresets_Click"/>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                            <TextBlock Text="PRO PRESETS" Foreground="White" FontSize="27" FontWeight="Bold"/>
+                            <TextBlock Text="Актуальные публичные настройки известных CS2 pro-игроков. Данные встроены в EXE и работают офлайн." Foreground="#777777" FontSize="11" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="#101010" BorderBrush="#262626" BorderThickness="1" CornerRadius="15" Padding="16" Margin="8,0,8,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="ВЫБЕРИ ИГРОКА" Foreground="#777777" FontSize="9" FontWeight="SemiBold" Margin="0,0,0,7"/>
+                                <ComboBox x:Name="ProPresetCombo" Style="{StaticResource DarkCombo}" Width="310" HorizontalAlignment="Left" SelectionChanged="ProPresetSelectionChanged"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#171717" CornerRadius="11" Padding="14,10" VerticalAlignment="Center">
+                                <TextBlock Text="10 VERIFIED SNAPSHOTS" Foreground="#BDBDBD" FontSize="10" FontWeight="SemiBold"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="2" Background="#0D0D0D" BorderBrush="#242424" BorderThickness="1" CornerRadius="16" Padding="20" Margin="8,0,8,12">
+                        <StackPanel>
+                            <TextBlock x:Name="ProPresetInfoText" Foreground="White" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" LineHeight="26"/>
+                            <Border Height="1" Background="#252525" Margin="0,18,0,16"/>
+                            <TextBlock Text="ЧТО ВОЙДЁТ В CFG" Foreground="#777777" FontSize="9" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="ProPresetCommandsText" Foreground="#B0B0B0" FontSize="12" TextWrapping="Wrap" LineHeight="19" Margin="0,7,0,0"/>
+                            <TextBlock Text="Видео, DPI и системная скорость мыши зависят от железа и ОС, поэтому они показываются как reference и не меняются автоматически." Foreground="#666666" FontSize="10" TextWrapping="Wrap" Margin="0,14,0,0"/>
+                            <TextBlock x:Name="ProPresetSourceText" Foreground="#505050" FontSize="9" TextWrapping="Wrap" Margin="0,17,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Grid.Row="3" Margin="8,0,8,0">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="Presets — снимки публичных настроек; pro-игроки могут менять их со временем." Foreground="#555555" FontSize="10" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="ПРИМЕНИТЬ В CFG BUILDER" Width="205" Margin="10,0,0,0" Click="ApplyProPresetToBuilder_Click"/>
+                        <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="В ЗАГРУЗКИ + УСТАНОВИТЬ" Width="220" Margin="10,0,0,0" Click="InstallProPreset_Click"/>
                     </Grid>
                 </Grid>
 
